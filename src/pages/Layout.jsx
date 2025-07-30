@@ -18,7 +18,7 @@ function Layout() {
                   <span className="nav-link disabled">{user.email}</span>
                 </li>
                 <li className="nav-item me-3">
-                  <Link className="nav-link" to="/productos">Productos</Link>
+                  <Link className="nav-link" to="/products">Productos</Link>
                 </li>
                 <li className="nav-item me-3">
                   <Link className="nav-link" to="/admin">Admin</Link>
