@@ -1,5 +1,5 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import PrivateRoute from "./routes/PrivateRoute";
+import { Routes, Route } from "react-router-dom";
+import RequireAuth from "./auth/RequireAuth";
 import { AuthProvider, useAuth } from "./auth/AuthProvider";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -25,9 +25,9 @@ function AppRoutes() {
         <Route
           index
           element={
-            <PrivateRoute>
+            <RequireAuth>
               <Home />
-            </PrivateRoute>
+            </RequireAuth>
           }
         />
 
@@ -35,7 +35,9 @@ function AppRoutes() {
         <Route
           path="admin"
           element={
-            user?.rol === "admin" ? <AdminPanel /> : <Navigate to="/" />
+            <RequireAuth role="admin">
+              <AdminPanel />
+              </RequireAuth>
           }
         />
       </Route>
