@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { createAdmin } from "../apiConnection/usersApi";
 
 function RegisterAdmin() {
   const [name, setName] = useState("");
@@ -28,17 +29,9 @@ function RegisterAdmin() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/user/register-admin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, password }),
-      });
+      const data = await createAdmin({name, email, password})
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (!data.error) {
         setSuccessMsg("Administrador registrado correctamente.");
         setTimeout(() => navigate("/login"), 2000);
       } else {

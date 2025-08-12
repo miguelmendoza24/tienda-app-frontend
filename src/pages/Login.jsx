@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
+import { userLogin } from "../apiConnection/usersApi";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -24,28 +25,24 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/user/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-  
-      if (response.ok) {
+      const data =  await userLogin({ email, password });
+      console.log(data);
+      
+      if (!data.error) {
+        console.log("mamo");
         setSuccessMsg("Inicio de sesión exitoso. Redirigiendo...");
         login(data.token);
         setTimeout(() => navigate("/"), 1500);
       } else {
         setErrorMsg(data.error || data.message || "Error al iniciar sesion")
+        console.log("valio verde");
       }
     } catch (error) {
       setErrorMsg("Error de conexión, intenta más tarde.");
     }
     setLoading(false)
   };
+
 
   return (
     <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "80vh" }}>

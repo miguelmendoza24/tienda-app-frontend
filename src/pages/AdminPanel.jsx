@@ -1,30 +1,13 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
+import { createProduct, getProducts, updateProduct } from "../apiConnection/productsApi";
+
+
 
 function AdminPanel() {
   const { token } = useAuth();
   const [products, setProducts] = useState([]);
   const [form, setForm] = useState({ code: "", name: "", price: "", stock: "", _id: null });
-
-  const API_URL = "http://localhost:3000/product";
-
-  const fetchProducts = async () => {
-    try {
-      const res = await fetch(`${API_URL}/list`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      if (!res.ok) {
-        const text = await res.text()
-        throw new Error(text)
-        }
-      const data = await res.json();
-      setProducts(data);
-    } catch (error) {
-      console.error("Error al obtener productos", error);
-    }
-  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -36,18 +19,12 @@ function AdminPanel() {
     const isEdit = !!form._id
 
     try {
-      const res = await fetch(isEdit ? `${API_URL}/update/${form.code}` : `${API_URL}/register`, {
-        method: isEdit ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(form),
-      });
+      const res = isEdit ? await updateProduct(token, form.code, form) : await createProduct(token, form)
 
-      if (res.ok) {
+      if (!res.error) {
         setForm({ code: "", name: "", price: "", stock: "", _id: null});
-        fetchProducts();
+        const data = await getProducts(token);
+        setProducts(data);
       } else {
         const errorData = await res.json();
         console.error("Error en el servidor:", errorData);
@@ -71,7 +48,8 @@ function AdminPanel() {
         return;
       }
 
-      fetchProducts();
+      const data = await getProducts(token);
+      setProducts(data);
     } catch (error) {
       console.error("Error al eliminar producto", error);
     }
@@ -87,8 +65,12 @@ function AdminPanel() {
     });
   };
 
+  const firstLoad = async () => {
+    const data = await getProducts(token);
+    setProducts(data);
+  }
   useEffect(() => {
-    fetchProducts();
+    firstLoad();
   }, []);
 
 

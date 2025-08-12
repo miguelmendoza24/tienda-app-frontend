@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { createUser } from "../apiConnection/usersApi";
 
 function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [nombre, setNombre] = useState("");
+  const [name, setNombre] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
@@ -20,7 +21,7 @@ function Register() {
     setErrorMsg("");
 
 
-    if (!nombre.trim() || !email.trim() || !password.trim()) {
+    if (!name.trim() || !email.trim() || !password.trim()) {
       setErrorMsg("Por favor, completa todos los campos.")
       return
     }
@@ -37,17 +38,8 @@ function Register() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/user/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: nombre, email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
+      const data = createUser({name, email, password})
+      if (!data.error) {
         setSuccessMsg("Registro exitoso. Serás redirigido...");
         setTimeout(() => navigate("/login"), 2000);
       } else {
@@ -55,6 +47,8 @@ function Register() {
       }
     } catch (error) {
       setErrorMsg("Error de conexion, intenta mas tarde.")
+      console.log(error);
+      
     }
     setLoading(false)
     
@@ -71,7 +65,7 @@ function Register() {
           className="form-control mb-3"
           type="text"
           placeholder="Nombre"
-          value={nombre}
+          value={name}
           onChange={(e) => setNombre(e.target.value)}
           autoFocus
         />

@@ -1,11 +1,11 @@
-export const apiUrl = "http://localhost:3000/";
+export const apiUrl = window.location.origin
 
-export const  apiRequest = async(
+export const apiRequest = async ({
   endpoint,
   method = "GET",
   token = null,
-  body = null
-) => {
+  body = null,
+}) => {
   const options = {
     method,
     headers: {
@@ -21,12 +21,15 @@ export const  apiRequest = async(
     options.body = JSON.stringify(body);
   }
 
-  const response = await fetch(`${apiUrl}${endpoint}`, options);
+  const response = await fetch(`${apiUrl}/${endpoint}`, options);
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+    console.log(response);
+    console.log(errorData);
+    
     throw new Error(errorData.message || "Error en la solicitud");
   }
 
   return response.json();
-}
+};

@@ -5,7 +5,7 @@ import { getProducts } from "../apiConnection/productsApi";
 import { buyProduct } from "../apiConnection/purchasesApi";
 
 function Products() {
-  const [productos, setProductos] = useState([]);
+  const [productos, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { token } = useAuth();
@@ -17,7 +17,7 @@ function Products() {
       await buyProduct(token, product.code, 1);
       alert(`Compra realizada de: ${product.name}`);
       const data = await getProducts(token);
-      setProductos(data);
+      setProducts(data);
     } catch (err) {
       alert(`Error al comprar: ${err.message}`);
     }
@@ -31,7 +31,7 @@ function Products() {
 
     getProducts(token)
       .then((data) => {
-        setProductos(data);
+        setProducts(data);
         setLoading(false)
       })
       .catch((err) => {
