@@ -1,14 +1,27 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import { getProducts } from "../apiConnection/productsApi";
+import { buyProduct } from "../apiConnection/purchasesApi";
 
 function Products() {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [message, setMessage] = useState("")
   const { token } = useAuth();
   const navigate = useNavigate();
+
+
+  const handleBuy = async (product) => {
+    try {
+      await buyProduct(token, product.code, 1);
+      alert(`Compra realizada de: ${product.name}`);
+      const data = await getProducts(token);
+      setProductos(data);
+    } catch (err) {
+      alert(`Error al comprar: ${err.message}`);
+    }
+  };
 
   useEffect(() => {
     if (!token) {
@@ -16,77 +29,27 @@ function Products() {
       return;
     }
 
-    fetch("http://localhost:3000/product/list", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          if (res.status === 401 || res.status === 403) {
-            navigate("/login");
-            return;
-          }
-          const errorData = await res.json();
-          throw new Error(errorData.message || "Error al cargar productos");
-        }
-        return res.json();
-      })
+    getProducts(token)
       .then((data) => {
         setProductos(data);
-        setLoading(false);
+        setLoading(false)
       })
       .catch((err) => {
         setError(err.message);
-        setLoading(false);
+        setLoading(false)
       });
-  }, [token, navigate]);
+  }, [token, navigate])
 
-
-  const handleBuy = async (code) => {
-    try {
-      const res = await fetch("http://localhost:3000/purchase/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          code,
-          quantity: 1,
-        }),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.message || "Error al comprar");
-      }
-
-      setMessage("Compra realizada con éxito");
-
-     
-      setProductos((prev) =>
-        prev.map((p) =>
-          p.code === code ? { ...p, stock: p.stock - 1 } : p
-        )
-      );
-    } catch (err) {
-      setMessage(` ${err.message}`);
-    }
-  };
-
-  if (loading) return <p>Cargando productos...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading) return <p>Cargando productos...</p>
+  if (loading) return <p>Error: {error}</p>
 
   return (
-    <div className="container mt-4">
+    <div className="row">
       <h2>Productos disponibles</h2>
-      {message && <div className="alert alert-info">{message}</div>}
-
       {productos.length === 0 ? (
         <p>No hay productos disponibles.</p>
       ) : (
-        <div className="row">
+        <ul className="row">
           {productos.map((prod) => (
             <div key={prod._id} className="col-md-4 mb-3">
               <div className="card h-100">
@@ -97,16 +60,16 @@ function Products() {
                   <p className="card-text">Stock: {prod.stock}</p>
                   <button
                     className="btn btn-primary"
-                    onClick={() => handleBuy(prod.code)}
-                    disabled={prod.stock < 1}
+                    onClick={() => handleBuy(prod)}
+                    disabled={prod.stock <= 0}
                   >
-                    Comprar
+                    {prod.stock > 0 ? "Comprar" : "Sin stock"}
                   </button>
                 </div>
               </div>
             </div>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );
