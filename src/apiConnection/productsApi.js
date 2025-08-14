@@ -1,4 +1,3 @@
-
 import { apiRequest } from "./apiConfig.js";
 
 export const getProducts = (token) => {
@@ -14,5 +13,5 @@ export const updateProduct = (token, id, data) => {
 };
 
 export const deleteProduct = (token, id) => {
-  return apiRequest({endpoint:`product/${id}`,method: "DELETE", token});
+  return apiRequest({endpoint:`product/delete/${id}`,method: "DELETE", token});
 };

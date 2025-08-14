@@ -1,0 +1,17 @@
+
+.navbar-nav .custom-btn {
+  min-width: 100px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 576px) {
+  .navbar-nav {
+    justify-content: center;
+  }
+  
+  .navbar-nav .custom-btn {
+    width: 100%; 
+    margin-bottom: 0.5rem; 
+  }
+}

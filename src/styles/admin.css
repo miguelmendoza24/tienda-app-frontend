@@ -1,0 +1,17 @@
+@media (max-width: 576px) {
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    width: 100%;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

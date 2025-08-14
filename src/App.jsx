@@ -10,7 +10,6 @@ import Products from "./pages/ProductsList";
 import AdminPanel from "./pages/AdminPanel";
 
 function AppRoutes() {
-  const { user } = useAuth();
 
   return (
     <Routes>
@@ -23,7 +22,7 @@ function AppRoutes() {
 
         {/* Rutas privadas */}
         <Route
-          index
+          path="home"
           element={
             <RequireAuth>
               <Home />

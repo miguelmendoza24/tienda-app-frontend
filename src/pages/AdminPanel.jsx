@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
-import { createProduct, getProducts, updateProduct } from "../apiConnection/productsApi";
-
+import { createProduct, deleteProduct, getProducts, updateProduct } from "../apiConnection/productsApi";
+import "../styles/admin.css"
 
 
 function AdminPanel() {
@@ -25,10 +25,7 @@ function AdminPanel() {
         setForm({ code: "", name: "", price: "", stock: "", _id: null});
         const data = await getProducts(token);
         setProducts(data);
-      } else {
-        const errorData = await res.json();
-        console.error("Error en el servidor:", errorData);
-      }
+      } 
     } catch (error) {
       console.error("Error al agregar/actualizar producto", error);
     }
@@ -36,20 +33,11 @@ function AdminPanel() {
 
   const handleDelete = async (code) => {
     try {
-      const res = await fetch(`${API_URL}/delete/${code}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error("Error del servidor:", errorData);
-        return;
+      const res = await deleteProduct(token, code)
+      if (!res.error) {
+        const data = await getProducts(token);
+        setProducts(data);
       }
-
-      const data = await getProducts(token);
-      setProducts(data);
     } catch (error) {
       console.error("Error al eliminar producto", error);
     }
@@ -73,75 +61,55 @@ function AdminPanel() {
     firstLoad();
   }, []);
 
-
   return (
     <div>
       <h2>Panel de Administrador</h2>
 
       <form onSubmit={handleSubmit} className="mb-4">
-        <input
-          name="code"
-          placeholder="Código de barras"
-          value={form.code}
-          onChange={handleChange}
-          className="form-control mb-2"
-        />
-
-        <input
-          name="name"
-          placeholder="Nombre"
-          value={form.name}
-          onChange={handleChange}
-          className="form-control mb-2"
-        />
-        <input
-          name="price"
-          placeholder="Precio"
-          value={form.price}
-          onChange={handleChange}
-          className="form-control mb-2"
-        />
-        <input
-          name="stock"
-          placeholder="Stock"
-          value={form.stock}
-          onChange={handleChange}
-          className="form-control mb-2"
-        />
-        <button className="btn btn-primary">{form._id ? "Actualizar producto" : "Agregar producto"}</button>
+        <input name="code" placeholder="Código de barras" value={form.code} onChange={handleChange} className="form-control mb-2" />
+        <input name="name" placeholder="Nombre" value={form.name} onChange={handleChange} className="form-control mb-2" />
+        <input name="price" placeholder="Precio" value={form.price} onChange={handleChange} className="form-control mb-2" />
+        <input name="stock" placeholder="Stock" value={form.stock} onChange={handleChange} className="form-control mb-2" />
+        <button className="btn btn-primary w-100">
+          {form._id ? "Actualizar producto" : "Agregar producto"}
+        </button>
       </form>
 
-      <table className="table table-bordered">
-        <thead>
-          <tr>
-            <th>Código</th>
-            <th>Nombre</th>
-            <th>Precio</th>
-            <th>Stock</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((p) => (
-            <tr key={p._id}>
-              <td>{p.code}</td>
-              <td>{p.name}</td>
-              <td>${p.price}</td>
-              <td>{p.stock}</td>
-              <td>
-                <button onClick={() => handleEdit(p)} className="btn btn-warning btn-sm me-2">
-                  Editar
-                </button>
-                <button onClick={() => handleDelete(p.code)} className="btn btn-danger btn-sm">
-                  Eliminar
-                </button>
-              </td>
+      <div className="table-responsive">
+        <table className="table table-bordered align-middle">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th className="text-center">Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {products.map((p) => (
+              <tr key={p._id}>
+                <td>{p.code}</td>
+                <td>{p.name}</td>
+                <td>${p.price}</td>
+                <td>{p.stock}</td>
+                <td className="action-buttons">
+                  <button onClick={() => handleEdit(p)} className="btn btn-warning btn-sm me-2 action-btn">
+                    Editar
+                  </button>
+                  <button onClick={() => handleDelete(p.code)} className="btn btn-danger btn-sm action-btn">
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
 
 export default AdminPanel;
+
+

@@ -19,6 +19,7 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
+    setSuccessMsg("");
 
 
     if (!name.trim() || !email.trim() || !password.trim()) {
@@ -38,7 +39,7 @@ function Register() {
     setLoading(true);
 
     try {
-      const data = createUser({name, email, password})
+      const data = await createUser({name, email, password})
       if (!data.error) {
         setSuccessMsg("Registro exitoso. Serás redirigido...");
         setTimeout(() => navigate("/login"), 2000);
@@ -55,45 +56,55 @@ function Register() {
   };
 
   return (
-    <div className="container mt-5" style={{ maxWidth: "400px" }}>
-      <h2>Registro</h2>
-      <form onSubmit={handleSubmit}>
-        {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
-        {successMsg && <div className="alert alert-success">{successMsg}</div>}
+    <div className="d-flex justify-content-center align-items-center">
 
-        <input
-          className="form-control mb-3"
-          type="text"
-          placeholder="Nombre"
-          value={name}
-          onChange={(e) => setNombre(e.target.value)}
-          autoFocus
-        />
-        <input
-          className="form-control mb-3"
-          type="email"
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          className="form-control mb-3"
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button className="btn btn-primary w-100" type="submit" disabled={loading}>
-          {loading ? "Registrando..." : "Registrarse"}
-        </button>
-      </form>
+      {loading && (
+        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white bg-opacity-75">
+          <div className="spinner-border text-primary">
+            <span className="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+      )}
+      <div className="card p-4">
+        <h4 className="mb-3 text-center">Registro</h4>
+        <form onSubmit={handleSubmit}>
+          {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
+          {successMsg && <div className="alert alert-success">{successMsg}</div>}
 
-      <p className="mt-3 text-center">
-        ¿Ya tienes cuenta?{" "}
-        <Link to="/login" className="text-primary">
-          Inicia sesión aquí
-        </Link>
-      </p>
+          <input
+            className="form-control mb-3"
+            type="text"
+            placeholder="Nombre"
+            value={name}
+            onChange={(e) => setNombre(e.target.value)}
+            autoFocus
+          />
+          <input
+            className="form-control mb-3"
+            type="email"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            className="form-control mb-3"
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button className="btn btn-primary w-100" type="submit" disabled={loading}>
+            {loading ? "Registrando..." : "Registrarse"}
+          </button>
+        </form>
+
+        <p className="mt-2 text-center">
+          ¿Ya tienes cuenta?{" "}
+          <Link to="/login" className="text-primary">
+            Inicia sesión aquí
+          </Link>
+        </p>
+      </div>
     </div>
   );
  
